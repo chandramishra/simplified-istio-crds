@@ -32,7 +32,7 @@ The pupose of this repo is to provide a generic simplified istio crd for non kub
 ```
  - run locally controller(or in a pod) 
 ```
-  python3.7 -m kopf run controller.py --verbose
+  python -m kopf run controller.py --verbose
 ```
  - Create actual simplified canary 
 ```
