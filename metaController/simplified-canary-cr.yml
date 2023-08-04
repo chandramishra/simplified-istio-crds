@@ -1,0 +1,21 @@
+apiVersion: simplify.istiocrd/v1
+kind: Canary
+metadata:
+  name: canary
+spec:
+  sources:
+  - podinfo-service
+  conf:
+    split:
+      - weight: 20
+        destination:
+          service: podinfo-service
+          version: "v1"
+      - weight: 40
+        destination:
+          service: podinfo-service
+          version: "v2"
+      - weight: 40
+        destination:
+          service: podinfo-service
+          version: "v3"

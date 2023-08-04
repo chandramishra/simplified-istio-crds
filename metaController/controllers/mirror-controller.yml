@@ -1,0 +1,18 @@
+apiVersion: metacontroller.k8s.io/v1alpha1
+kind: CompositeController
+metadata:
+  name: mirror-controller
+spec:
+  generateSelector: true
+  parentResource:
+    apiVersion:  simplify.istiocrd/v1
+    resource: mirrors
+  childResources:
+  - apiVersion: networking.istio.io/v1alpha3
+    resource: virtualservices
+    updateStrategy:
+      method: Recreate
+  hooks:
+    sync:
+      webhook:
+        url: http://istio-webhook-service.test/sync

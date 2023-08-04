@@ -1,0 +1,46 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: canarys.simplify.istiocrd
+spec:
+  group: simplify.istiocrd
+  names:
+    kind: Canary
+    plural: canarys
+    singular: canary
+  scope: Namespaced
+  versions:
+  - name: v1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              sources:
+                type: array
+                items:
+                  type: string
+              conf:
+                type: object
+                properties:
+                  split:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        weight:
+                          type: number
+                        destination:
+                          type: object
+                          properties:
+                            service:
+                              type: string
+                            version:
+                              type: string
+                   
+    subresources:
+     status: {}

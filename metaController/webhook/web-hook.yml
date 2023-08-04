@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: istio-webhook
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: istio-webhook
+  template:
+    metadata:
+      labels:
+        app: istio-webhook
+    spec:
+      containers:
+      - name: controller
+        image: python:3
+        command: ["python3", "/hooks/sync.py"]
+        volumeMounts:
+        - name: hooks
+          mountPath: /hooks
+      volumes:
+      - name: hooks
+        configMap:
+          name: istio-webhook
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: istio-webhook-service
+spec:
+  selector:
+    app: istio-webhook
+  ports:
+  - port: 80

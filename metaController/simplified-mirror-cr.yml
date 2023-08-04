@@ -1,0 +1,19 @@
+apiVersion: simplify.istiocrd/v1
+kind: Mirror
+metadata:
+  name: mirror
+spec:
+  sources:
+  - podinfo-service
+  conf:
+    split:
+      - weight: 100
+        destination:
+          service: podinfo-service
+          version: "v1"
+    mirror:
+      destination:
+        service: podinfo-service
+        version: "v2"
+    mirrorPercentage: 100
+
