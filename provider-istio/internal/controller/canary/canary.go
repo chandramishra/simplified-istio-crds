@@ -191,14 +191,15 @@ func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
         fmt.Println("******************Managed resource Manifest ************************************")
 	fmt.Printf("Creating: %+v", cr)
         fmt.Println("******************Creating Resource ************************************")
-	data := "{\"apiVersion\": \"networking.istio.io/v1alpha3\",\"kind\": \"VirtualService\",\"metadata\": {\"name\": \"helloworld\"},\"spec\": {\"hosts\": [\"podinfo-service\"],\"http\": [{\"route\": [{\"destination\": {\"host\": \"podinfo-service\",\"subset\": \"v1\"},\"weight\": 20},{\"destination\": {\"host\": \"podinfo-service\",\"subset\": \"v2\"},\"weight\": 80}]}]}}"
+	sources := cr.Spec.ForProvider.Sources[0]
+	v1_w := cr.Spec.ForProvider.Split[0].Weight
+	v2_w := cr.Spec.ForProvider.Split[1].Weight
+	data := string(fmt.Sprintf("{\"apiVersion\": \"networking.istio.io/v1alpha3\",\"kind\": \"VirtualService\",\"metadata\": {\"name\": \"helloworld\"},\"spec\": {\"hosts\": [\"%s\"],\"http\": [{\"route\": [{\"destination\": {\"host\": \"%s\",\"subset\": \"v1\"},\"weight\": %d},{\"destination\": {\"host\": \"%s\",\"subset\": \"v2\"},\"weight\": %d}]}]}}",sources,sources,v1_w,sources,v2_w))
 	bytes := []byte(data)
 	virtualService := &v1alpha3.VirtualService{}
 	json.Unmarshal(bytes, &virtualService)
 	c.service.istioObj.NetworkingV1alpha3().VirtualServices("test").Create(context.TODO(), virtualService, metav1.CreateOptions{})
-	vsList, err := c.service.istioObj.NetworkingV1alpha3().VirtualServices("test").List(context.TODO(), metav1.ListOptions{})
-        fmt.Println(vsList)
-        fmt.Println(err)
+	//cr.Status.AtProvider.State = true
 
 	return managed.ExternalCreation{
 		// Optionally return any details that may be required to connect to the
