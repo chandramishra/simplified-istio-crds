@@ -1,0 +1,10 @@
+apiVersion: meta.pkg.crossplane.io/v1alpha1
+kind: Provider
+metadata:
+  name: provider-istio
+  annotations:
+    meta.crossplane.io/maintainer: Crossplane Maintainers <info@crossplane.io>
+    meta.crossplane.io/source: github.com/crossplane/provider-istio
+    meta.crossplane.io/license: Apache-2.0
+    meta.crossplane.io/description: |
+      A istio that can be used to create Crossplane providers.

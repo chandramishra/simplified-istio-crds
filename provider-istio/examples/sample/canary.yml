@@ -1,0 +1,11 @@
+apiVersion: simplified.istio.crossplane.io/v1alpha1
+kind: Canary
+metadata:
+  name: example-test
+spec:
+  forProvider:
+    name: test
+    weight: "10"
+    destination: pod-info
+  providerConfigRef:
+    name: simplified-provider

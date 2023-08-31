@@ -1,0 +1,19 @@
+apiVersion: simplified.istio.crossplane.io/v1alpha1
+kind: Canary
+metadata:
+  name: example-test
+spec:
+  forProvider:
+    sources:
+    - podinfo-service
+    split:
+      - weight: 20
+        destination:
+          service: podinfo-service
+          version: "v1"
+      - weight: 80
+        destination:
+          service: podinfo-service
+          version: "v2"
+  providerConfigRef:
+    name: simplified-provider

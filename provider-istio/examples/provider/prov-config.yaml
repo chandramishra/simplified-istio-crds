@@ -1,0 +1,7 @@
+apiVersion: istio.crossplane.io/v1alpha1
+kind: ProviderConfig
+metadata:
+  name: simplified-provider
+spec:
+  credentials:
+    source: InjectedIdentity
