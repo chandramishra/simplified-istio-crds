@@ -15,20 +15,17 @@ with the following features that are meant to be refactored:
 1. Run `make submodules` to initialize the "build" Make submodule we use for CI/CD.
 1. Rename the provider by running the following command:
 ```shell
-  export provider_name=MyProvider # Camel case, e.g. GitHub
-  make provider.prepare provider=${provider_name}
+  make provider.prepare provider=Istio
 ```
 4. Add your new type by running the following command:
 ```shell
-  export group=sample # lower case e.g. core, cache, database, storage, etc.
-  export type=MyType # Camel casee.g. Bucket, Database, CacheCluster, etc.
-  make provider.addtype provider=${provider_name} group=${group} kind=${type}
+  make provider.addtype provider=Istio group=simplified kind=Canary
 ```
 5. Replace the *sample* group with your new group in apis/{provider}.go
 5. Replace the *mytype* type with your new type in internal/controller/{provider}.go
 5. Replace the default controller and ProviderConfig implementations with your own
-5. Run `make reviewable` to run code generation, linters, and tests.
-5. Run `make build` to build the provider.
+5. make generate
+5. Run `make run` to run the provider.
 
 Refer to Crossplane's [CONTRIBUTING.md] file for more information on how the
 Crossplane community prefers to work. The [Provider Development][provider-dev]
