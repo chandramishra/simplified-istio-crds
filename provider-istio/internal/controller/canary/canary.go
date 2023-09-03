@@ -38,6 +38,8 @@ import (
 	"github.com/crossplane/crossplane-runtime/pkg/ratelimiter"
 	"github.com/crossplane/crossplane-runtime/pkg/reconciler/managed"
 	"github.com/crossplane/crossplane-runtime/pkg/resource"
+	"github.com/crossplane/crossplane-runtime/pkg/meta"
+	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 
 	"github.com/crossplane/provider-istio/apis/simplified/v1alpha1"
 	apisv1alpha1 "github.com/crossplane/provider-istio/apis/v1alpha1"
@@ -152,7 +154,6 @@ type external struct {
 	// would be something like an AWS SDK client.
 	service *IstioService
 }
-
 func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.ExternalObservation, error) {
 	cr, ok := mg.(*v1alpha1.Canary)
 	if !ok {
@@ -160,10 +161,13 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 	}
 
 	// These fmt statements should be removed in the real implementation.
+	fmt.Println("******************Observing: Managed resource Manifest ************************************")
 	fmt.Printf("Observing: %+v", cr)
-	if true {
+	//if true {
+	if meta.GetExternalName(cr) != "helloworld" {
 		return managed.ExternalObservation{ResourceExists: false}, nil
 	}
+	cr.SetConditions(xpv1.Available())
 
 	return managed.ExternalObservation{
 		// Return false when the external resource does not exist. This lets
@@ -199,8 +203,9 @@ func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
 	virtualService := &v1alpha3.VirtualService{}
 	json.Unmarshal(bytes, &virtualService)
 	c.service.istioObj.NetworkingV1alpha3().VirtualServices("test").Create(context.TODO(), virtualService, metav1.CreateOptions{})
-	//cr.Status.AtProvider.State = true
+	meta.SetExternalName(cr, "helloworld")
 
+	//cr.Status.AtProvider.State = true
 	return managed.ExternalCreation{
 		// Optionally return any details that may be required to connect to the
 		// external resource. These will be stored as the connection secret.
