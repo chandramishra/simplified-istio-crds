@@ -25,6 +25,11 @@ with the following features that are meant to be refactored:
 5. Replace the *mytype* type with your new type in internal/controller/{provider}.go
 5. Replace the default controller and ProviderConfig implementations with your own
 5. make generate
+5. apply crds
+```shell
+kubectl apply -f package/crds/
+```
+
 5. Run `make run` to run the provider.
 
 Refer to Crossplane's [CONTRIBUTING.md] file for more information on how the

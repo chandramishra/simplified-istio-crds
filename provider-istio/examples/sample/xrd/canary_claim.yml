@@ -1,0 +1,14 @@
+apiVersion: istio.com/v1alpha1
+kind: Canary
+metadata:
+  namespace: test
+  name: canary-claim
+spec:
+  compositionRef:
+    name: canary-composition
+  parameters:
+    source: podinfo-service
+    destination:
+      service: podinfo-service
+      version_v1_weight: "20"
+      version_v2_weight: "80"

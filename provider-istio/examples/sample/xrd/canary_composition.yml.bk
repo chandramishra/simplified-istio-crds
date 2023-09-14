@@ -1,0 +1,46 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: canary-composition
+spec:
+  compositeTypeRef:
+    apiVersion: istio.com/v1alpha1
+    kind: XCanary
+  resources:
+  - name: istio-canary
+    base:
+      apiVersion: simplified.istio.crossplane.io/v1alpha1
+      kind: Canary
+      metadata:
+        name: example-test
+      spec:
+        forProvider:
+          sources:
+          - podinfo-service
+          split:
+            - weight:
+              destination:
+                service:
+                version: "v1"
+            - weight:
+              destination:
+                service:
+                version: "v2"
+        providerConfigRef:
+          name: simplified-provider
+    patches:
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.parameters.source
+      toFieldPath: spec.forProvider.sources[0]
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.parameters.source.destination.version_v1_weight
+      toFieldPath: spec.forProvider.split[0].weight
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.parameters.source.destination.service
+      toFieldPath: spec.forProvider.split[0].destination.service
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.parameters.source.destination.version_v2_weight
+      toFieldPath: spec.forProvider.split[1].weight
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.parameters.source.destination.service
+      toFieldPath: spec.forProvider.split[1].destination.service

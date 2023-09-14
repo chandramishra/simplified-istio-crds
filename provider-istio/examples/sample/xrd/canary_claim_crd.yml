@@ -1,0 +1,43 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xcanarys.istio.com
+spec:
+  group: istio.com
+  names:
+    kind: XCanary
+    plural: xcanarys
+  defaultCompositionRef:
+    name: canary-composition
+  claimNames:
+    kind: Canary
+    plural: canarys
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              parameters:
+                type: object
+                properties:
+                  source:
+                    type: string
+                  destination:
+                    type: object
+                    properties:
+                      service:
+                        type: string
+                      version_v1_weight:
+                        type: string
+                      version_v2_weight:
+                        type: string
+                required:
+                - source
+            required:
+            - parameters
