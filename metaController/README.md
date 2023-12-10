@@ -25,12 +25,7 @@ The pupose of this repo is to provide a generic simplified istio crd for non kub
   kubectl apply -f kube_crds/canary-crd.yml  
   kubectl apply -f kube_crds/mirror-crd.yml  
 ```
- Deploy controller for each crd:
- ```
-  kubectl apply -f controllers//canary-controller.yml  
-  kubectl apply -f controllers/mirror-controller.yml  
-```
- Create istio policies using simplified crds:
+ Deploy webhook in a namespace:
 
  - create a namespace
 ```
@@ -44,6 +39,12 @@ The pupose of this repo is to provide a generic simplified istio crd for non kub
 ```
    kubectl apply -f webhook/web-hook.yml -n test
 ```
+ Deploy controller for each crd:
+ ```
+  kubectl apply -f controllers//canary-controller.yml  
+  kubectl apply -f controllers/mirror-controller.yml  
+```
+ Create istio policies using simplified crds:
  - Create actual simplified canary & mirror policy
 ```
    kubectl apply -f simplified-canary-cr.yml -n test
