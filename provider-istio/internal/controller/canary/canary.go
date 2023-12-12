@@ -162,8 +162,9 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 
 	// These fmt statements should be removed in the real implementation.
 	fmt.Println("******************Observing: Managed resource Manifest ************************************")
-	fmt.Printf("Observing: %+v", cr)
+	//fmt.Printf("Observing: %+v", cr)
 	//if true {
+	fmt.Println(meta.GetExternalName(cr))
 	if meta.GetExternalName(cr) != "helloworld" {
 		return managed.ExternalObservation{ResourceExists: false}, nil
 	}
@@ -193,16 +194,23 @@ func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
 	}
 
         fmt.Println("******************Managed resource Manifest ************************************")
-	fmt.Printf("Creating: %+v", cr)
-        fmt.Println("******************Creating Resource ************************************")
+	fmt.Printf("Creating:VS %+v", cr)
+        fmt.Println("******************Started creating VS Resource ************************************")
 	sources := cr.Spec.ForProvider.Sources[0]
 	v1_w := cr.Spec.ForProvider.Split[0].Weight
 	v2_w := cr.Spec.ForProvider.Split[1].Weight
-	data := string(fmt.Sprintf("{\"apiVersion\": \"networking.istio.io/v1alpha3\",\"kind\": \"VirtualService\",\"metadata\": {\"name\": \"helloworld\"},\"spec\": {\"hosts\": [\"%s\"],\"http\": [{\"route\": [{\"destination\": {\"host\": \"%s\",\"subset\": \"v1\"},\"weight\": %d},{\"destination\": {\"host\": \"%s\",\"subset\": \"v2\"},\"weight\": %d}]}]}}",sources,sources,v1_w,sources,v2_w))
-	bytes := []byte(data)
+	vs := string(fmt.Sprintf("{\"apiVersion\": \"networking.istio.io/v1alpha3\",\"kind\": \"VirtualService\",\"metadata\": {\"name\": \"helloworld\"},\"spec\": {\"hosts\": [\"%s\"],\"http\": [{\"route\": [{\"destination\": {\"host\": \"%s\",\"subset\": \"v1\"},\"weight\": %d},{\"destination\": {\"host\": \"%s\",\"subset\": \"v2\"},\"weight\": %d}]}]}}",sources,sources,v1_w,sources,v2_w))
+	bytes := []byte(vs)
 	virtualService := &v1alpha3.VirtualService{}
 	json.Unmarshal(bytes, &virtualService)
 	c.service.istioObj.NetworkingV1alpha3().VirtualServices("test").Create(context.TODO(), virtualService, metav1.CreateOptions{})
+        fmt.Println("******************Started creating DR Resource ************************************")
+	dr := "{\"apiVersion\": \"networking.istio.io/v1alpha3\",\"kind\": \"DestinationRule\",\"metadata\": {\"name\": \"helloworld\"},\"spec\": {\"host\": \"helloworld\",\"subsets\": [{\"name\": \"v1\",\"labels\": {\"version\": \"v1\"}},{\"name\": \"v2\",\"labels\": {\"version\": \"v2\"}}]}}"
+	fmt.Printf("Creating DR: %+v", dr)
+	dr_bytes := []byte(dr)
+	destinationRule := &v1alpha3.DestinationRule{}
+	json.Unmarshal(dr_bytes, &destinationRule)
+	c.service.istioObj.NetworkingV1alpha3().DestinationRules("test").Create(context.TODO(), destinationRule, metav1.CreateOptions{})
 	meta.SetExternalName(cr, "helloworld")
 
 	//cr.Status.AtProvider.State = true
@@ -233,8 +241,11 @@ func (c *external) Delete(ctx context.Context, mg resource.Managed) error {
 	if !ok {
 		return errors.New(errNotCanary)
 	}
-
-	fmt.Printf("Deleting: %+v", cr)
-
+        fmt.Println("******************Deleting ************************************\n")
+	c.service.istioObj.NetworkingV1alpha3().VirtualServices("test").Delete(context.TODO(), "helloworld", metav1.DeleteOptions{})
+	c.service.istioObj.NetworkingV1alpha3().DestinationRules("test").Delete(context.TODO(), "helloworld", metav1.DeleteOptions{})
+	meta.RemoveFinalizer(cr, "finalizer.managedresource.crossplane.io")
+	fmt.Printf("Updating: %+v", cr)
+        //return c.kube.client.Delete(ctx, "helloworld")
 	return nil
 }

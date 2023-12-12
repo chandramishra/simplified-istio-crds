@@ -30,7 +30,10 @@ with the following features that are meant to be refactored:
 kubectl apply -f package/crds/
 ```
 
-5. Run `make run` to run the provider.
+6. Run `make run` to run the provider.
+6. `kubectl create ns test`
+6. `kubectl apply -f examples/provider/prov-config.yaml -n test`
+6. `kubectl apply -f examples/sample/newcanary.yml -n test`
 
 Refer to Crossplane's [CONTRIBUTING.md] file for more information on how the
 Crossplane community prefers to work. The [Provider Development][provider-dev]
